@@ -15,5 +15,7 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
+	router.POST("/generate-doc", GenerateDocController)
+
 	return router
 }

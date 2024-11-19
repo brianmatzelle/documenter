@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    ports:
+      - 8050:8050
+    container_name: api
+    depends_on:
+      - ollama
+    environment:
+      - GIN_MODE=release
+    env_file:
+      - .env
+    networks:
+      - ollama-docker
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434
+    volumes:
+      - .:/code
+      - ./ollama-volume:/root/.ollama
+    container_name: ollama
+    # pull_policy: always
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - ollama-docker
+
+networks:
+  ollama-docker:
+    external: false

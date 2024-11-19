@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Exit on any error
+set -e
+
+# Get version from argument, default to 'latest' if not provided
+VERSION=${1:-latest}
+
+# Find the documenter directory by going up until we find it
+DOCUMENTER_DIR=$(pwd)
+while [[ "${DOCUMENTER_DIR}" != "/" && "${DOCUMENTER_DIR##*/}" != "documenter" ]]; do
+    DOCUMENTER_DIR=$(dirname "$DOCUMENTER_DIR")
+done
+
+if [[ "${DOCUMENTER_DIR}" == "/" ]]; then
+    echo "Error: Could not find documenter directory"
+    exit 1
+fi
+
+# Build with error checking
+echo "Building image brianmatzelle/documenter:${VERSION}..."
+if ! docker build --rm -t brianmatzelle/documenter:${VERSION} "$DOCUMENTER_DIR"; then
+    echo "Error: Docker build failed"
+    exit 1
+fi  
+
+echo "Tagging image as brianmatzelle/documenter:${VERSION}..."
+if ! docker tag brianmatzelle/documenter:${VERSION} brianmatzelle/documenter:${VERSION}; then
+    echo "Error: Docker tag failed"
+    exit 1
+fi
+
+echo "Successfully built documenter:${VERSION}"

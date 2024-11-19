@@ -1,0 +1,12 @@
+.editorconfig
+.git
+AUTHORS.md
+CONTRIBUTING.md
+LICENSE
+NOTICE
+README.md
+.env
+scripts/*
+.dockerignore
+.gitignore
+ollama-volume/*
