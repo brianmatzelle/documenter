@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"documenter/models/requests"
+	"documenter/models/responses"
 	"documenter/services"
 	"net/http"
 
@@ -19,5 +20,5 @@ func GenerateDocController(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, responses.GenDocResponse{Doc: response})
 }

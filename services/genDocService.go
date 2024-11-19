@@ -4,35 +4,36 @@ import (
 	"documenter/models/requests"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"documenter/pkg/generate"
 	"documenter/pkg/gitlab"
 )
 
 func GenerateDocService(request requests.GenDocRequest) (string, error) {
-	fmt.Println("Generating document...")
-	// get request to request.MrLink, set authentication header with request.GitlabToken
-	mrApiLink := gitlab.GetMrApiLink(request.MrLink)
-	mrInfo, err := gitlab.GetMrInfo(mrApiLink, request.GitlabToken)
+	log.Println("Starting document generation process...")
+
+	mrInfo, err := gitlab.GetMrInfo(request.MrLink, request.GitlabToken)
 	if err != nil {
-		return "", err
+		log.Printf("Failed to fetch MR info: %v", err)
+		return "", fmt.Errorf("failed to fetch merge request info: %w", err)
 	}
 
-	// for verbose
 	mrTitle, err := showMrInfoTitle(mrInfo)
 	if err != nil {
-		return "", err
+		log.Printf("Failed to extract MR title: %v", err)
+		return "", fmt.Errorf("failed to extract merge request title: %w", err)
 	}
-	fmt.Println("Got merge request info from gitlab, title: ", mrTitle)
-	// end for verbose
+	log.Printf("Successfully fetched MR info for: %s", mrTitle)
 
-	// call ollama to generate doc
-	fmt.Println("Generating document...")
-	docStr, err := generate.GenerateDoc(mrInfo)
+	log.Println("Starting document generation with Ollama...")
+	docStr, err := generate.GenerateDocOllama(mrInfo)
 	if err != nil {
-		return "", err
+		log.Printf("Failed to generate document: %v", err)
+		return "", fmt.Errorf("failed to generate document: %w", err)
 	}
-	fmt.Println("Generated document: ", docStr)
+	log.Println("Successfully generated document")
+
 	return docStr, nil
 }
 

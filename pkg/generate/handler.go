@@ -9,12 +9,39 @@ import (
 	"documenter/pkg/generate/lib"
 	"documenter/pkg/generate/models"
 	"documenter/pkg/generate/models/requests"
+
+	"github.com/rs/zerolog/log"
 )
 
-func GenerateDoc(mrInfo json.RawMessage) (string, error) {
+func GenerateDocOllama(mrInfo json.RawMessage) (string, error) {
 	start := time.Now()
-	ollamaReq := requests.OllamaRequest{
-		Model: config.OLLAMA_MODEL,
+	logger := log.With().Str("func", "GenerateDocOllama").Logger()
+
+	ollamaReq := buildOllamaRequest(mrInfo)
+
+	logger.Info().
+		Str("model", ollamaReq.Model).
+		Bool("stream", ollamaReq.Stream).
+		Int("messages", len(ollamaReq.Messages)).
+		Msg("Sending Ollama request")
+
+	ollamaResp, err := lib.TalkToOllama(ollamaReq)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to get Ollama response")
+		return "", fmt.Errorf("failed to get Ollama response: %w", err)
+	}
+
+	logger.Info().
+		Dur("duration", time.Since(start)).
+		Msg("Generated document completed")
+
+	return ollamaResp.Message.Content, nil
+}
+
+func buildOllamaRequest(mrInfo json.RawMessage) requests.OllamaRequest {
+	return requests.OllamaRequest{
+		Model:  config.OLLAMA_MODEL,
+		Stream: false,
 		Messages: []models.Message{
 			{
 				Role:    "system",
@@ -25,18 +52,5 @@ func GenerateDoc(mrInfo json.RawMessage) (string, error) {
 				Content: config.OLLAMA_PRE_PROMPT + string(mrInfo),
 			},
 		},
-		Stream: false,
 	}
-	fmt.Printf("Sending Ollama request:\n  Model: %s\n  Stream: %v\n  Messages: %d\n",
-		ollamaReq.Model, ollamaReq.Stream, len(ollamaReq.Messages))
-
-	ollamaResp, err := lib.TalkToOllama(ollamaReq)
-
-	fmt.Println("Got ollama response")
-	if err != nil {
-		fmt.Println("Error getting ollama response: ", err)
-		return "", err
-	}
-	fmt.Printf("Generated document completed in %v\n", time.Since(start))
-	return ollamaResp.Message.Content, nil
 }
