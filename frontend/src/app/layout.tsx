@@ -3,6 +3,7 @@ import "./globals.css";
 import StarfieldWrapper from "@/components/starfieldWrapper";
 import Footer from "@/app/_footer/footer";
 import { Inconsolata } from 'next/font/google'
+import { DocProvider } from "@/context/doc-context";
 
 const font = Inconsolata({
   subsets: ['latin'],
@@ -22,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${font.className} flex flex-col h-screen w-full`}>
-        <StarfieldWrapper />
-        {children}
-        <Footer />
+        <DocProvider>
+          <StarfieldWrapper />
+          {children}
+          <Footer />
+        </DocProvider>
       </body>
     </html>
   );
