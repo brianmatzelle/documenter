@@ -1,13 +1,19 @@
+import { colors } from "./ui/colors";
+
 export default function TitleCard() {
 	return (
-		<div className="flex flex-col items-center justify-center h-full gap-4">
-			<h1 className="text-4xl font-bold">
-				<span className="text-[hsl(169,100%,20%)]">SageSure</span> Documenter
-				{/* SageSure Documenter */}
+		<div className="flex flex-col items-center justify-center h-full gap-2 sm:gap-4">
+			<h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+				<span className={`text-[${colors.primary}]`}>SageSure</span> Documenter
 			</h1>
-			<p className="text-lg">
-				AI documenter for SageSure merge requests, by brian matzelle
-			</p>
+      <div className="flex flex-col items-center justify-center gap-1">
+        <p className="text-base sm:text-lg text-center px-4">
+          AI documentation generator for SageSure merge requests,
+        </p>
+        <p className="text-xs sm:text-sm">
+          by brian matzelle
+        </p>
+      </div>
 		</div>
 	)
 }
