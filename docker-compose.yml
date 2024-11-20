@@ -1,8 +1,6 @@
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile  
+    image: brianmatzelle/documenter:latest
     ports:
       - 8050:8050
     container_name: api
@@ -10,6 +8,7 @@ services:
       - ollama
     environment:
       - GIN_MODE=release
+      - PORT=8050
     env_file:
       - .env
     networks:
@@ -18,7 +17,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - 11434
+      - 11434:11434 # for testing, remove the :11434 later
     volumes:
       - .:/code
       - ./ollama-volume:/root/.ollama
