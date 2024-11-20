@@ -22,11 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${font.className} flex flex-col h-screen w-full`}>
-        <main className="flex-grow">
-        <DocProvider>
-          <StarfieldWrapper />
-          {children}
+      <body className={`${font.className} flex flex-col min-h-screen w-full`}>
+        <main className="flex-grow flex flex-col">
+          <DocProvider>
+            <StarfieldWrapper />
+            {children}
             <Footer />
           </DocProvider>
         </main>

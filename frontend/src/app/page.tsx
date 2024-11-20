@@ -71,7 +71,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-around h-full p-4">
+		<div className="flex-1 flex flex-col items-center justify-around gap-4 p-4">
 			<Card className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
 				<TitleCard />
 				<div className="w-full flex flex-col sm:flex-row gap-2">
@@ -126,7 +126,7 @@ export default function Home() {
 			</Card>
 
 			{doc && (
-				<div className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl mt-4">
+				<div className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
 					<Button 
 						onClick={handleCopyDoc}
 						className="mb-2 w-full"
