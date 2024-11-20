@@ -14,5 +14,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // @ts-expect-error: Tailwind plugins require CommonJS import style
+    require('@tailwindcss/typography'),
+  ],
 } satisfies Config;

@@ -10,6 +10,7 @@ import { useDocContext } from "@/context/doc-context";
 import { HashLoader } from "react-spinners";
 import Select from "@/components/ui/select";
 import SelectItem from "@/components/ui/select-item";
+import MdViewer from "@/components/mdViewer";
 
 export default function Home() {
 	const [mrLink, setMrLink] = useState("");
@@ -20,7 +21,7 @@ export default function Home() {
 		gitlabToken: "",
 	});
 	const [loading, setLoading] = useState(false);
-	const { setDoc } = useDocContext();
+	const { doc, setDoc } = useDocContext();
 
 
 	const validateForm = () => {
@@ -48,7 +49,7 @@ export default function Home() {
 		if (validateForm()) {
 			try {
 				setLoading(true);
-				const response = await generateDoc(mrLink, gitlabToken);
+				const response = await generateDoc(mrLink, gitlabToken, model);
 				console.log(response);
 				setDoc(response.doc);
 			} catch (error) {
@@ -114,7 +115,7 @@ export default function Home() {
 				</div>
 			</Card>
 
-			<div></div>
+			{doc && <div><MdViewer content={doc} /></div> || <div>No document generated yet</div>}
 
 		</div>
 	)
