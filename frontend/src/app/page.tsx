@@ -22,7 +22,7 @@ export default function Home() {
 	});
 	const [loading, setLoading] = useState(false);
 	const { doc, setDoc } = useDocContext();
-
+	const [copySuccess, setCopySuccess] = useState(false);
 
 	const validateForm = () => {
 		let isValid = true;
@@ -57,6 +57,16 @@ export default function Home() {
 			} finally {
 				setLoading(false);
 			}
+		}
+	};
+
+	const handleCopyDoc = async () => {
+		try {
+			await navigator.clipboard.writeText(doc);
+			setCopySuccess(true);
+			setTimeout(() => setCopySuccess(false), 2000);
+		} catch (err) {
+			console.error('Failed to copy text:', err);
 		}
 	};
 
@@ -115,8 +125,17 @@ export default function Home() {
 				</div>
 			</Card>
 
-			{doc && <div><MdViewer content={doc} /></div> || <div>No document generated yet</div>}
-
+			{doc && (
+				<div className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl mt-4">
+					<Button 
+						onClick={handleCopyDoc}
+						className="mb-2 w-full"
+					>
+						{copySuccess ? "Copied!" : "Copy Document"}
+					</Button>
+					<MdViewer content={doc} />
+				</div>
+			) || <div>No document generated yet</div>}
 		</div>
 	)
 }
