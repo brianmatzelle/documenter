@@ -8,10 +8,13 @@ import { useState } from "react";
 import { generateDoc } from "@/use-cases/generateDoc";
 import { useDocContext } from "@/context/doc-context";
 import { HashLoader } from "react-spinners";
+import Select from "@/components/ui/select";
+import SelectItem from "@/components/ui/select-item";
 
 export default function Home() {
 	const [mrLink, setMrLink] = useState("");
 	const [gitlabToken, setGitlabToken] = useState("");
+	const [model, setModel] = useState("openai");
 	const [errors, setErrors] = useState({
 		mrLink: "",
 		gitlabToken: "",
@@ -91,6 +94,13 @@ export default function Home() {
 								<span className="text-red-500 text-sm">{errors.gitlabToken}</span>
 							)}
 						</div>
+						<Select
+							value={model}
+							onChange={(e) => setModel(e.target.value)}
+						>
+							<SelectItem value="openai">OpenAI</SelectItem>
+							<SelectItem value="ollama">Ollama</SelectItem>
+						</Select>
 					</div>
 					<Button 
 						className={`w-full sm:w-auto sm:flex-1 flex justify-center items-center  ${

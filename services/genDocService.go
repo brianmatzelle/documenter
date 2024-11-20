@@ -2,7 +2,6 @@ package services
 
 import (
 	"documenter/models/requests"
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -18,31 +17,28 @@ func GenerateDocService(request requests.GenDocRequest) (string, error) {
 		log.Printf("Failed to fetch MR info: %v", err)
 		return "", fmt.Errorf("failed to fetch merge request info: %w", err)
 	}
+	log.Println("Successfully fetched MR info")
 
-	mrTitle, err := showMrInfoTitle(mrInfo)
-	if err != nil {
-		log.Printf("Failed to extract MR title: %v", err)
-		return "", fmt.Errorf("failed to extract merge request title: %w", err)
+	switch request.Model {
+	case "ollama":
+		log.Println("Starting document generation with Ollama...")
+		docStr, err := generate.GenerateDocOllama(mrInfo)
+		if err != nil {
+			log.Printf("Failed to generate document: %v", err)
+			return "", fmt.Errorf("failed to generate document: %w", err)
+		}
+		log.Println("Successfully generated document")
+		return docStr, nil
+	case "openai":
+		log.Println("Starting document generation with OpenAI...")
+		docStr, err := generate.GenerateDocOpenAI(mrInfo)
+		if err != nil {
+			log.Printf("Failed to generate document: %v", err)
+			return "", fmt.Errorf("failed to generate document: %w", err)
+		}
+		log.Println("Successfully generated document")
+		return docStr, nil
+	default:
+		return "", fmt.Errorf("invalid model: %s", request.Model)
 	}
-	log.Printf("Successfully fetched MR info for: %s", mrTitle)
-
-	log.Println("Starting document generation with Ollama...")
-	docStr, err := generate.GenerateDocOllama(mrInfo)
-	if err != nil {
-		log.Printf("Failed to generate document: %v", err)
-		return "", fmt.Errorf("failed to generate document: %w", err)
-	}
-	log.Println("Successfully generated document")
-
-	return docStr, nil
-}
-
-func showMrInfoTitle(mrInfo json.RawMessage) (string, error) {
-	var mrInfoMap map[string]interface{}
-	err := json.Unmarshal(mrInfo, &mrInfoMap)
-	if err != nil {
-		fmt.Println("Error unmarshalling merge request info: ", err)
-		return "", err
-	}
-	return mrInfoMap["title"].(string), nil
 }
