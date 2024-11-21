@@ -2,13 +2,13 @@ services:
   api:
     image: brianmatzelle/documenter:latest
     ports:
-      - 8050:8050
+      - 8080:8080
     container_name: api
     depends_on:
       - ollama
     environment:
       - GIN_MODE=release
-      - PORT=8050
+      - PORT=8080
     env_file:
       - .env
     networks:
