@@ -1,6 +1,6 @@
-# Documenter - AI-Powered Documentation Generator for GitLab Merge Requests
+# Documenter - AI-Powered Documentation Generator for Merge Requests
 
-Documenter is a tool that automatically generates documentation and release notes from GitLab merge requests using AI models (OpenAI or Ollama). It simplifies the documentation process by analyzing merge request details and producing structured markdown documentation.
+Documenter is a tool that automatically generates documentation and release notes from merge requests using AI models (OpenAI or Ollama). It simplifies the documentation process by analyzing merge request details and producing structured markdown documentation.
 
 ## Features
 
