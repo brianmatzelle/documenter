@@ -26,3 +26,12 @@ go.work.sum
 
 # ollama
 ollama-volume/*
+
+
+## INCASE I STUPIDLY RUN NPM I IN THE ROOT (not in the frontend)
+# node_modules
+node_modules/
+
+# package-lock.json
+package-lock.json
+package.json
