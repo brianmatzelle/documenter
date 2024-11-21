@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "battlezone-shapes": "^2.0.2",
+    "clsx": "^2.1.1",
     "next": "15.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
-    "react-spinners": "^0.14.1"
+    "react-spinners": "^0.14.1",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",

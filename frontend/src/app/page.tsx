@@ -11,6 +11,7 @@ import { HashLoader } from "react-spinners";
 import Select from "@/components/ui/select";
 import SelectItem from "@/components/ui/select-item";
 import MdViewer from "@/components/mdViewer";
+import { gitlabColors } from "@/lib/colors";
 
 export default function Home() {
 	const [mrLink, setMrLink] = useState("");
@@ -73,7 +74,7 @@ export default function Home() {
 	return (
 		<div className="flex-1 flex flex-col items-center justify-around gap-4 p-4">
 			<Card className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
-				<TitleCard />
+				<TitleCard companyName="GitLab" companyColors={Object.values(gitlabColors)} />
 				<div className="w-full flex flex-col sm:flex-row gap-2">
 					<div className="flex-[4] flex flex-col gap-2">
 						<div className="flex flex-col gap-1">
@@ -120,7 +121,7 @@ export default function Home() {
 						disabled={loading} 
 						onClick={handleGenerate}
 					>
-						{loading ? <HashLoader color="hsl(169,100%,20%)" /> : "Generate"}
+						{loading ? <HashLoader color={gitlabColors.CINNABAR} /> : "Generate"}
 					</Button>
 				</div>
 			</Card>

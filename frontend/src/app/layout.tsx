@@ -11,8 +11,8 @@ const font = Inconsolata({
 })
 
 export const metadata: Metadata = {
-  title: "SageSure Documenter",
-  description: "Documenter for SageSure merge requests, by brian matzelle",
+  title: "GitLab Documenter",
+  description: "Documenter for GitLab merge requests, by brian matzelle",
 };
 
 export default function RootLayout({
