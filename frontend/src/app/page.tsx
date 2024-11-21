@@ -111,7 +111,7 @@ export default function Home() {
 							onChange={(e) => setModel(e.target.value)}
 						>
 							<SelectItem value="openai">GPT-4o</SelectItem>
-							<SelectItem value="ollama">Llama 3.1 (Ollama)</SelectItem>
+							<SelectItem value="ollama">Llama 3.2 (Ollama)</SelectItem>
 						</Select>
 					</div>
 					<Button 
