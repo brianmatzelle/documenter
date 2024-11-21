@@ -24,10 +24,10 @@ if ! docker build --rm -t brianmatzelle/documenter:${VERSION} "$DOCUMENTER_DIR";
     exit 1
 fi  
 
-echo "Tagging image as brianmatzelle/documenter:${VERSION}..."
-if ! docker tag brianmatzelle/documenter:${VERSION} brianmatzelle/documenter:${VERSION}; then
-    echo "Error: Docker tag failed"
+echo "Pushing image to Docker Hub..."
+if ! docker push brianmatzelle/documenter:${VERSION}; then
+    echo "Error: Docker push failed"
     exit 1
 fi
 
-echo "Successfully built documenter:${VERSION}"
+echo "Successfully built and pushed documenter:${VERSION}"

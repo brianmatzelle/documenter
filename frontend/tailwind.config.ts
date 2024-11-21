@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import typography from '@tailwindcss/typography';
 
 export default {
   content: [
@@ -15,7 +16,6 @@ export default {
     },
   },
   plugins: [
-    // @ts-expect-error: Tailwind plugins require CommonJS import style
-    require('@tailwindcss/typography'),
+    typography,
   ],
 } satisfies Config;
