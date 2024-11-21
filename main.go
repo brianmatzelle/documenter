@@ -9,5 +9,9 @@ import (
 func main() {
 	config.LoadEnv()
 	router := c.SetupRouter()
-	router.Run(fmt.Sprintf(":%s", config.GetEnv("PORT")))
+	port := config.GetEnv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	router.Run(fmt.Sprintf(":%s", port))
 }
