@@ -13,7 +13,7 @@ Documenter is a tool that automatically generates documentation and release note
 
 ## Demo
 
-![documenter-demo)[]
+![documenter-demo](https://github.com/brianmatzelle/documenter/blob/main/demos/documenter-demo.gif?raw=true)
 
 ## Quick Start
 
