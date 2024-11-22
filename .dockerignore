@@ -10,3 +10,4 @@ scripts/*
 .dockerignore
 .gitignore
 ollama-volume/*
+demos/*

@@ -11,6 +11,10 @@ Documenter is a tool that automatically generates documentation and release note
 * RESTful API: Simple HTTP endpoints for document generation
 * Structured Output: Generates markdown documentation with TLDR and Key Features sections
 
+## Demo
+
+![documenter-demo)[]
+
 ## Quick Start
 
 1. Create a .env file with your configuration:
