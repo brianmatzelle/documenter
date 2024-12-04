@@ -46,7 +46,7 @@ Request Body:
 {
     "mrLink": "https://gitlab.com/your-project/merge_requests/1",
     "gitlabToken": "your-gitlab-token",
-    "model": "ollama|openai"
+    "model": "ollama" OR "openai"
 }
 ```
 
