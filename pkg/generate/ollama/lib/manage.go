@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
+
 	"slices"
 )
 
@@ -20,13 +22,14 @@ type Model struct {
 	// other fields omitted as they're not needed for our use case
 }
 
-func LoadModel(model string) error {
-	log.Printf("Checking if model %s exists...", model)
+func LoadModel(model string, statusChan chan string) error {
+	statusChan <- fmt.Sprintf("Checking if model %s exists...", model)
 	if modelExists(model) {
-		log.Printf("Model %s already exists", model)
+		statusChan <- fmt.Sprintf("Model %s is ready", model)
 		return nil
 	}
 
+	statusChan <- fmt.Sprintf("Downloading model %s (this may take a few minutes)...", model)
 	err := pullModel(model)
 	if err != nil {
 		return fmt.Errorf("failed to pull model %s: %w", model, err)
@@ -43,6 +46,9 @@ func pullModel(model string) error {
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonStr))
 	if err != nil {
+		if strings.Contains(err.Error(), "no such host") {
+			return fmt.Errorf("COULDN'T CONNECT TO OLLAMA - is it running?: %w", err)
+		}
 		return fmt.Errorf("failed to pull model: %w", err)
 	}
 	defer resp.Body.Close()

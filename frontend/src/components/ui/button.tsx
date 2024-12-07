@@ -7,7 +7,7 @@ const Button = forwardRef<
 	return (
 		<button
 			ref={ref}
-			className={`w-full p-2 rounded-md border bg-white/10 border-gray-300 hover:bg-white/20 transition-colors ${className || ''}`}
+			className={`rounded-md border bg-white/15 border-gray-300 hover:bg-white/25 transition-colors ${className || ''}`}
 			{...props}
 		>
 			{children}

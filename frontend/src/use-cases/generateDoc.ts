@@ -1,8 +1,8 @@
-export async function generateDoc(mrLink: string, gitlabToken: string, model: string) {
+export async function generateDoc(mrLinks: string[], gitlabToken: string, model: string) {
   const response = await fetch(`/generate-doc`, {
     method: "POST",
     body: JSON.stringify({ 
-      mrLink: mrLink,
+      mrLinks: mrLinks,
       gitlabToken: gitlabToken,
       model: model,
      }),

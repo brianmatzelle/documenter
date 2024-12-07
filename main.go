@@ -4,6 +4,7 @@ import (
 	"documenter/config"
 	c "documenter/controllers"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -13,5 +14,6 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	log.Printf("Starting http server on port %s", port)
 	router.Run(fmt.Sprintf(":%s", port))
 }

@@ -1,16 +1,24 @@
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
+import FocusedMsg from './focused-msg'
 
 const Input = forwardRef<
   HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => {
+  React.InputHTMLAttributes<HTMLInputElement> & { label: string }
+>(({ className, label, ...props }, ref) => {
+  const [isFocused, setIsFocused] = useState(false)
+
   return (
-    <input
-      ref={ref}
-      type="text"
-      className={`w-full p-2 rounded-md border bg-white/10 border-gray-300 ${className || ''}`}
-      {...props}
-    />
+    <div className="flex flex-col relative">
+      <FocusedMsg show={isFocused}>{label}</FocusedMsg>
+      <input
+        ref={ref}
+        type="text"
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={`w-full p-2 rounded-md border bg-white/10 border-gray-300 focus:outline-none ${className || ''}`}
+        {...props}
+      />
+    </div>
   )
 })
 

@@ -12,8 +12,9 @@ import (
 	"documenter/pkg/generate/ollama/models"
 )
 
-func TalkToOllama(ollamaReq models.OllamaRequest) (*models.OllamaResponse, error) {
-	if err := lib.LoadModel(ollamaReq.Model); err != nil {
+func TalkToOllama(ollamaReq models.OllamaRequest, statusChan chan string) (*models.OllamaResponse, error) {
+	statusChan <- fmt.Sprintf("Checking if model %s exists...", ollamaReq.Model)
+	if err := lib.LoadModel(ollamaReq.Model, statusChan); err != nil {
 		return nil, fmt.Errorf("failed to load model: %w", err)
 	}
 
@@ -34,6 +35,7 @@ func TalkToOllama(ollamaReq models.OllamaRequest) (*models.OllamaResponse, error
 
 	// Send request
 	log.Printf("sending request to ollama at %s", chatUrl)
+	log.Printf("request body: %s", string(body))
 	httpResp, err := client.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request to ollama: %w", err)
@@ -50,9 +52,21 @@ func TalkToOllama(ollamaReq models.OllamaRequest) (*models.OllamaResponse, error
 	return &ollamaResp, nil
 }
 
-func BuildOllamaRequest(mrInfo json.RawMessage) models.OllamaRequest {
+func BuildOllamaRequest(mrInfos []json.RawMessage, model string) models.OllamaRequest {
+	var mrInfosString string
+	for _, mrInfo := range mrInfos {
+		mrInfosString += string(mrInfo) + "\n"
+	}
+
+	var prePrompt string
+	if len(mrInfos) == 1 {
+		prePrompt = config.OLLAMA_PRE_PROMPT_SINGLE
+	} else {
+		prePrompt = config.OLLAMA_PRE_PROMPT_MULTI
+	}
+
 	return models.OllamaRequest{
-		Model:  config.OLLAMA_MODEL,
+		Model:  model,
 		Stream: false,
 		Messages: []models.Message{
 			{
@@ -61,7 +75,7 @@ func BuildOllamaRequest(mrInfo json.RawMessage) models.OllamaRequest {
 			},
 			{
 				Role:    "user",
-				Content: config.OLLAMA_PRE_PROMPT + string(mrInfo),
+				Content: prePrompt + mrInfosString,
 			},
 		},
 	}

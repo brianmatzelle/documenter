@@ -1,7 +1,7 @@
 package requests
 
 type GenDocRequest struct {
-	MrLink      string `json:"mrLink"`
-	GitlabToken string `json:"gitlabToken"`
-	Model       string `json:"model"`
+	MrLinks     []string `json:"mrLinks" binding:"required,min=1"`
+	GitlabToken string   `json:"gitlabToken" binding:"required"`
+	Model       string   `json:"model" binding:"required"`
 }

@@ -49,7 +49,21 @@ func TalkToOpenAI(openaiReq models.OpenAIRequest) (*models.OpenAIResponse, error
 	return &openaiResp, nil
 }
 
-func BuildOpenAIRequest(mrInfo json.RawMessage) models.OpenAIRequest {
+func BuildOpenAIRequest(mrInfos []json.RawMessage) models.OpenAIRequest {
+	var mrInfosString string
+	for _, mrInfo := range mrInfos {
+		mrInfosString += string(mrInfo) + "\n"
+	}
+
+	var prePrompt string
+	if len(mrInfos) == 1 {
+		log.Printf("Using single MR pre-prompt, %d MR provided", len(mrInfos))
+		prePrompt = config.OPENAI_PRE_PROMPT_SINGLE
+	} else {
+		log.Printf("Using multi-MR pre-prompt, %d MRs provided", len(mrInfos))
+		prePrompt = config.OPENAI_PRE_PROMPT_MULTI
+	}
+
 	return models.OpenAIRequest{
 		Model: config.OPENAI_MODEL,
 		Messages: []models.Message{
@@ -59,7 +73,7 @@ func BuildOpenAIRequest(mrInfo json.RawMessage) models.OpenAIRequest {
 			},
 			{
 				Role:    "user",
-				Content: config.OPENAI_PRE_PROMPT + string(mrInfo),
+				Content: prePrompt + mrInfosString,
 			},
 		},
 	}

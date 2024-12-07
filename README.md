@@ -44,7 +44,7 @@ Request Body:
 
 ```json
 {
-    "mrLink": "https://gitlab.com/your-project/merge_requests/1",
+    "mrLinks": ["https://gitlab.com/your-project/merge_requests/1", "https://gitlab.com/your-project/merge_requests/2"],
     "gitlabToken": "your-gitlab-token",
     "model": "ollama" OR "openai"
 }

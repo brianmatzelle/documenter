@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -25,7 +27,17 @@ func TranslateMrLinkToApiLink(mrLink string, gitlabToken string) (string, error)
 
 	mrId := getMrIdFromMrLink(mrLink)
 	apiLink := fmt.Sprintf("https://gitlab.icg360.net/api/v4/projects/%s/merge_requests/%s/changes", projectId, mrId)
-	fmt.Printf("Generated API link: %s\n", apiLink)
+	log.Printf("Generated API link: %s\n", apiLink)
+	return apiLink, nil
+}
+
+func TranslatePathToApiLink(projectId string, path string, gitlabToken string) (string, error) {
+	// example path = "src/main/java/com/icg360/keystone/security/AuthProcessingFilter.java",
+	// output https://gitlab.icg360.net/api/v4/projects/{{projectId}}/repository/files/src%2Fmain%2Fjava%2Fcom%2Ficg360%2Fkeystone%2Fsecurity%2FAuthProcessingFilter.java/raw?ref=main
+
+	encodedPath := url.PathEscape(path)
+	apiLink := fmt.Sprintf("https://gitlab.icg360.net/api/v4/projects/%s/repository/files/%s/raw?ref=main", projectId, encodedPath)
+	log.Printf("Generated API link: %s\n", apiLink)
 	return apiLink, nil
 }
 
@@ -39,7 +51,7 @@ func getProjectIdFromMrLink(mrLink string, gitlabToken string) (string, error) {
 	if projectName == "eng" {
 		projectName = parts[4]
 	}
-	fmt.Printf("Searching for project: %s\n", projectName)
+	log.Printf("Searching for project: %s\n", projectName)
 
 	url := fmt.Sprintf("https://gitlab.icg360.net/api/v4/projects?search=%s", projectName)
 	client := &http.Client{}
@@ -69,7 +81,7 @@ func getProjectIdFromMrLink(mrLink string, gitlabToken string) (string, error) {
 	for _, project := range projects {
 		if project["name"] == projectName {
 			id := strconv.Itoa(int(project["id"].(float64)))
-			fmt.Printf("Found project ID: %s\n", id)
+			log.Printf("Found project ID: %s\n", id)
 			return id, nil
 		}
 	}
@@ -80,6 +92,6 @@ func getProjectIdFromMrLink(mrLink string, gitlabToken string) (string, error) {
 func getMrIdFromMrLink(mrLink string) string {
 	parts := strings.Split(mrLink, "/")
 	mrId := parts[len(parts)-1]
-	fmt.Printf("Extracted merge request ID: %s\n", mrId)
+	log.Printf("Extracted merge request ID: %s\n", mrId)
 	return mrId
 }

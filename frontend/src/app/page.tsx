@@ -7,14 +7,16 @@ import Button from "@/components/ui/button";
 import { useState } from "react";
 import { generateDoc } from "@/use-cases/generateDoc";
 import { useDocContext } from "@/context/doc-context";
-import { HashLoader } from "react-spinners";
 import Select from "@/components/ui/select";
 import SelectItem from "@/components/ui/select-item";
 import MdViewer from "@/components/mdViewer";
 import { gitlabColors } from "@/lib/colors";
+import ListInput from "@/components/ui/list-input";
+import GenerateButton from "@/components/generate-button";
 
 export default function Home() {
-	const [mrLink, setMrLink] = useState("");
+	// const [mrLink, setMrLink] = useState("");
+	const [mrLinks, setMrLinks] = useState([""]);
 	const [gitlabToken, setGitlabToken] = useState("");
 	const [model, setModel] = useState("openai");
 	const [errors, setErrors] = useState({
@@ -29,11 +31,11 @@ export default function Home() {
 		let isValid = true;
 		const newErrors = { mrLink: "", gitlabToken: "" };
 
-		if (!mrLink.trim()) {
+		if (mrLinks.length === 0) {
 			newErrors.mrLink = "MR link is required";
 			isValid = false;
-		} else if (!mrLink.includes("gitlab")) {
-			newErrors.mrLink = "Please enter a valid GitLab MR link";
+		} else if (!mrLinks.every(link => link.includes("gitlab"))) {
+			newErrors.mrLink = "At least one MR link is invalid, only GitLab MR links are supported as of now.";
 			isValid = false;
 		}
 
@@ -50,7 +52,7 @@ export default function Home() {
 		if (validateForm()) {
 			try {
 				setLoading(true);
-				const response = await generateDoc(mrLink, gitlabToken, model);
+				const response = await generateDoc(mrLinks, gitlabToken, model);
 				console.log(response);
 				setDoc(response.doc);
 			} catch (error) {
@@ -77,35 +79,33 @@ export default function Home() {
 				<TitleCard companyName="GitLab" companyColors={Object.values(gitlabColors)} />
 				<div className="w-full flex flex-col sm:flex-row gap-2">
 					<div className="flex-[4] flex flex-col gap-2">
-						<div className="flex flex-col gap-1">
-							<Input 
-								value={mrLink}
-								onChange={(e) => {
-									setMrLink(e.target.value);
-									if (errors.mrLink) setErrors(prev => ({ ...prev, mrLink: "" }));
-								}}
-								placeholder="Enter your MR link here"
-								className={errors.mrLink ? "border-red-500" : ""} 
-							/>
-							{errors.mrLink && (
-								<span className="text-red-500 text-sm">{errors.mrLink}</span>
-							)}
-						</div>
-						<div className="flex flex-col gap-1">
-							<Input 
-								value={gitlabToken}
-								onChange={(e) => {
-									setGitlabToken(e.target.value);
-									if (errors.gitlabToken) setErrors(prev => ({ ...prev, gitlabToken: "" }));
-								}}
-								placeholder="Enter your GitLab token here"
-								className={errors.gitlabToken ? "border-red-500" : ""} 
-								type="password"
-							/>
-							{errors.gitlabToken && (
-								<span className="text-red-500 text-sm">{errors.gitlabToken}</span>
-							)}
-						</div>
+						
+						<ListInput 
+							mrLinks={mrLinks}
+							onMrLinksChange={setMrLinks}
+							label="Merge Request Link"
+							placeholder="Enter your MR link here"
+							className={errors.mrLink ? "border-red-500" : ""} 
+						/>
+						{errors.mrLink && (
+							<span className="text-red-500 text-sm">{errors.mrLink}</span>
+						)}
+
+						<Input 
+							label="GitLab Token"
+							value={gitlabToken}
+							onChange={(e) => {
+								setGitlabToken(e.target.value);
+								if (errors.gitlabToken) setErrors(prev => ({ ...prev, gitlabToken: "" }));
+							}}
+							placeholder="Enter your GitLab token here"
+							className={errors.gitlabToken ? "border-red-500" : ""} 
+							type="password"
+						/>
+						{errors.gitlabToken && (
+							<span className="text-red-500 text-sm">{errors.gitlabToken}</span>
+						)}
+
 						<Select
 							value={model}
 							onChange={(e) => setModel(e.target.value)}
@@ -114,15 +114,12 @@ export default function Home() {
 							<SelectItem value="ollama">Llama 3.2 (Ollama)</SelectItem>
 						</Select>
 					</div>
-					<Button 
-						className={`w-full sm:w-auto sm:flex-1 flex justify-center items-center  ${
-							loading ? "bg-transparent/40 hover:bg-transparent/40 border-none" : ""
-						}`} 
-						disabled={loading} 
+
+					<GenerateButton 
+						loading={loading}
 						onClick={handleGenerate}
-					>
-						{loading ? <HashLoader color={gitlabColors.CINNABAR} /> : "Generate"}
-					</Button>
+					/>
+
 				</div>
 			</Card>
 

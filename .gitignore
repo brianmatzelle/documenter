@@ -40,3 +40,9 @@ package.json
 venv/
 .venv/
 __pycache__/
+
+# ollama
+ollama-volume/*
+
+# debug
+debug-request.json

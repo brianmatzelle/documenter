@@ -4,6 +4,8 @@ services:
     ports:
       - 8080:8080
     container_name: api
+    restart: always
+    pull_policy: always
     depends_on:
       - ollama
     environment:
