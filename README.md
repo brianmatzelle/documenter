@@ -303,7 +303,7 @@ curl -X POST http://localhost:8080/generate-doc \
   - [X] OpenAI
   - [X] Ollama (local)
   - [ ] Anthropic
-- [ ] Parse and clean the merge request data to improve prompt quality
+- [X] Parse and clean the merge request data to improve prompt quality
 - [ ] Refine the pre-prompt to produce more desirable documentation results
 - [ ] Implement chat functionality so the user can talk with the merge request.
   - [ ] "Adjust X and include Y..."
