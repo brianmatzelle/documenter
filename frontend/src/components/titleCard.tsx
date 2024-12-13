@@ -1,11 +1,12 @@
 import { splitTextIntoColorChunks } from "@/lib/colors";
 
-export default function TitleCard({ companyName, companyColors }: { 
+export default function TitleCard({ className, companyName, companyColors }: { 
+  className?: string,
   companyName: string, 
   companyColors: string[]
 }) {
 	return (
-		<div className="flex flex-col items-center justify-center h-full gap-2 sm:gap-4">
+		<div className={`flex flex-col items-center justify-center h-full gap-2 sm:gap-4 ${className ?? ''}`}>
 			<h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
 				{splitTextIntoColorChunks(companyName, companyColors).map(({ text, color }, index) => (
 					<span key={index} style={{ color }}>{text}</span>

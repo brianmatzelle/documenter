@@ -3,6 +3,7 @@ package controllers
 import (
 	"documenter/models/requests"
 	"documenter/services"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +14,31 @@ func GenerateDocController(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
 
-	var request requests.GenDocRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.SSEvent("error", gin.H{"error": err.Error()})
+	// Parse query parameters
+	mrLinksJSON := c.Query("mrLinks")
+	var mrLinks []string
+	if err := json.Unmarshal([]byte(mrLinksJSON), &mrLinks); err != nil {
+		c.SSEvent("error", gin.H{"error": "Invalid mrLinks format"})
+		return
+	}
+
+	request := requests.GenDocRequest{
+		MrLinks:     mrLinks,
+		GitlabToken: c.Query("gitlabToken"),
+		Model:       c.Query("model"),
+	}
+
+	// Validate the request
+	if len(request.MrLinks) == 0 {
+		c.SSEvent("error", gin.H{"error": "mrLinks is required"})
+		return
+	}
+	if request.GitlabToken == "" {
+		c.SSEvent("error", gin.H{"error": "gitlabToken is required"})
+		return
+	}
+	if request.Model == "" {
+		c.SSEvent("error", gin.H{"error": "model is required"})
 		return
 	}
 

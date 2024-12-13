@@ -1,12 +1,35 @@
-export async function generateDoc(mrLinks: string[], gitlabToken: string, model: string) {
-  const response = await fetch(`/generate-doc`, {
-    method: "POST",
-    body: JSON.stringify({ 
-      mrLinks: mrLinks,
-      gitlabToken: gitlabToken,
-      model: model,
-     }),
-  });
+export async function generateDoc(mrLinks: string[], gitlabToken: string, model: string, setStatus: (status: string) => void): Promise<string> {
+  // Return an EventSource that the caller can use to listen for events
+  const eventSource = new EventSource(`/generate-doc?${new URLSearchParams({
+    mrLinks: JSON.stringify(mrLinks),
+    gitlabToken,
+    model: model.toLowerCase(),
+  })}`);
 
-  return response.json();
+  return new Promise((resolve, reject) => {
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setStatus(data.message);
+    };
+
+    eventSource.addEventListener('status', (event) => {
+      console.log('Status update:', event.data);
+      const data = JSON.parse(event.data);
+      setStatus(data.message);
+    });
+
+    eventSource.addEventListener('complete', (event) => {
+      const data = JSON.parse(event.data);
+      eventSource.close();
+      setStatus("");
+      resolve(data.doc);
+    });
+
+    eventSource.addEventListener('error', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      eventSource.close();
+      setStatus(data.error);
+      reject(new Error(data.error));
+    });
+  });
 }

@@ -3,7 +3,7 @@ import { forwardRef } from 'react'
 type Position = 't' | 'b' | 'l' | 'r'
 
 interface FocusedMsgProps {
-  show: boolean
+  hidden: boolean
   children: React.ReactNode
   position?: Position
   arrow?: boolean
@@ -19,8 +19,8 @@ const arrowLabels: Record<Position, string> = {
 }
 
 const FocusedMsg = forwardRef<HTMLParagraphElement, FocusedMsgProps>(
-  ({ show, children, position = 'l', arrow = true, offset = 24 }, ref) => {
-    if (!show) return null
+  ({ hidden , children, position = 'l', arrow = true, offset = 24 }, ref) => {
+    if (hidden === true) return null
 
     const positionClasses: Record<Position, string> = {
       't': `left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+${offset}px)]`,

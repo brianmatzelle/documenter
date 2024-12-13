@@ -2,7 +2,7 @@ services:
   api:
     image: brianmatzelle/documenter:latest
     ports:
-      - 8080:8080
+      - 8080
     container_name: api
     restart: always
     pull_policy: always
@@ -19,7 +19,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - 11434:11434 # for testing, remove the :11434 later
+      - 11434
     volumes:
       - .:/code
       - ./ollama-volume:/root/.ollama
@@ -31,6 +31,18 @@ services:
       - OLLAMA_HOST=0.0.0.0
     networks:
       - ollama-docker
+
+  frontend:
+    image: brianmatzelle/documenter-frontend:latest
+    ports:
+      - 3000:3000
+    container_name: frontend
+    restart: always
+    pull_policy: always
+    depends_on:
+      - api
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://api:8080
 
 networks:
   ollama-docker:

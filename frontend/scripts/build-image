@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Exit on any error
+set -e
+
+# Get version from argument, default to 'latest' if not provided
+VERSION=${1:-latest}
+
+# Find the frontend directory
+FRONTEND_DIR=$(pwd)
+while [[ "${FRONTEND_DIR}" != "/" && "${FRONTEND_DIR##*/}" != "frontend" ]]; do
+    FRONTEND_DIR=$(dirname "$FRONTEND_DIR")
+done
+
+if [[ "${FRONTEND_DIR}" == "/" ]]; then
+    echo "Error: Could not find frontend directory"
+    exit 1
+fi
+
+# Build with error checking
+echo "Building image brianmatzelle/documenter-frontend:${VERSION}..."
+if ! docker build --rm -t brianmatzelle/documenter-frontend:${VERSION} "$FRONTEND_DIR"; then
+    echo "Error: Docker build failed"
+    exit 1
+fi
+
+echo "Pushing image to Docker Hub..."
+if ! docker push brianmatzelle/documenter-frontend:${VERSION}; then
+    echo "Error: Docker push failed"
+    exit 1
+fi
+
+echo "Successfully built and pushed documenter-frontend:${VERSION}"

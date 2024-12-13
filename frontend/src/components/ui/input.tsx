@@ -8,8 +8,8 @@ const Input = forwardRef<
   const [isFocused, setIsFocused] = useState(false)
 
   return (
-    <div className="flex flex-col relative">
-      <FocusedMsg show={isFocused}>{label}</FocusedMsg>
+    <div className="flex flex-col relative w-full">
+      <FocusedMsg hidden={!isFocused} position="l">{label}</FocusedMsg>
       <input
         ref={ref}
         type="text"

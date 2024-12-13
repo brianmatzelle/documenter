@@ -31,7 +31,7 @@ const ListInput = forwardRef<HTMLInputElement, ListInputProps>(
       <div className="flex flex-col gap-2">
         {mrLinks.map((link, index) => (
           <div key={index} className="flex flex-col relative">
-            <FocusedMsg show={focusedIndex === index} position="l">{label}</FocusedMsg>
+            <FocusedMsg hidden={focusedIndex !== index} position="l">{label}</FocusedMsg>
             <div className="flex">
               <input
                 ref={index === mrLinks.length - 1 ? ref : undefined}
@@ -45,7 +45,7 @@ const ListInput = forwardRef<HTMLInputElement, ListInputProps>(
                 }`}
                 {...props}
               />
-              {index === mrLinks.length - 1 ? (
+              {index === 0 ? (
                 <Button
                   onClick={handleAddInput}
                   className="px-4 py-2 rounded-none rounded-r-md border border-l-white/20"

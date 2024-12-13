@@ -117,40 +117,40 @@ func cleanMrResponse(mrResponse json.RawMessage, gitlabToken string, model strin
 	return cleanedJSON, nil
 }
 
-// func getFileSourceCode(projectId string, newPath string, gitlabToken string) (string, error) {
-// 	log.Printf("Fetching source code for project %s, path: %s", projectId, newPath)
+func getFileSourceCode(projectId string, newPath string, gitlabToken string) (string, error) {
+	log.Printf("Fetching source code for project %s, path: %s", projectId, newPath)
 
-// 	apiLink, err := lib.TranslatePathToApiLink(projectId, newPath, gitlabToken)
-// 	if err != nil {
-// 		log.Printf("Failed to translate path to API link: %v", err)
-// 		return "", fmt.Errorf("translating path to API link: %w", err)
-// 	}
+	apiLink, err := lib.TranslatePathToApiLink(projectId, newPath, gitlabToken)
+	if err != nil {
+		log.Printf("Failed to translate path to API link: %v", err)
+		return "", fmt.Errorf("translating path to API link: %w", err)
+	}
 
-// 	client := &http.Client{}
-// 	req, err := http.NewRequest(http.MethodGet, apiLink, nil)
-// 	if err != nil {
-// 		return "", fmt.Errorf("creating request: %w", err)
-// 	}
-// 	req.Header.Set("PRIVATE-TOKEN", gitlabToken)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, apiLink, nil)
+	if err != nil {
+		return "", fmt.Errorf("creating request: %w", err)
+	}
+	req.Header.Set("PRIVATE-TOKEN", gitlabToken)
 
-// 	resp, err := client.Do(req)
-// 	if err != nil {
-// 		log.Printf("Failed to execute request for %s: %v", newPath, err)
-// 		return "", fmt.Errorf("executing request: %w", err)
-// 	}
-// 	defer resp.Body.Close()
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Failed to execute request for %s: %v", newPath, err)
+		return "", fmt.Errorf("executing request: %w", err)
+	}
+	defer resp.Body.Close()
 
-// 	if resp.StatusCode != http.StatusOK {
-// 		log.Printf("Received non-200 status code (%d) for %s", resp.StatusCode, newPath)
-// 		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-// 	}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Received non-200 status code (%d) for %s", resp.StatusCode, newPath)
+		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
 
-// 	body, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		log.Printf("Failed to read response body for %s: %v", newPath, err)
-// 		return "", fmt.Errorf("reading response: %w", err)
-// 	}
-// 	sourceCode := string(body)
-// 	log.Printf("Successfully retrieved source code for %s, length: %d", newPath, len(sourceCode))
-// 	return sourceCode, nil
-// }
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Failed to read response body for %s: %v", newPath, err)
+		return "", fmt.Errorf("reading response: %w", err)
+	}
+	sourceCode := string(body)
+	log.Printf("Successfully retrieved source code for %s, length: %d", newPath, len(sourceCode))
+	return sourceCode, nil
+}

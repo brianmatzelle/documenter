@@ -15,10 +15,12 @@ import ListInput from "@/components/ui/list-input";
 import GenerateButton from "@/components/generate-button";
 
 export default function Home() {
-	// const [mrLink, setMrLink] = useState("");
 	const [mrLinks, setMrLinks] = useState([""]);
 	const [gitlabToken, setGitlabToken] = useState("");
-	const [model, setModel] = useState("openai");
+	const [model, setModel] = useState("gpt-4o");
+	const [modelInput, setModelInput] = useState("");
+	const [modelInputOpen, setModelInputOpen] = useState(false);
+	const [status, setStatus] = useState("");
 	const [errors, setErrors] = useState({
 		mrLink: "",
 		gitlabToken: "",
@@ -52,9 +54,9 @@ export default function Home() {
 		if (validateForm()) {
 			try {
 				setLoading(true);
-				const response = await generateDoc(mrLinks, gitlabToken, model);
+				const response: string = await generateDoc(mrLinks, gitlabToken, model, setStatus);
 				console.log(response);
-				setDoc(response.doc);
+				setDoc(response);
 			} catch (error) {
 				console.error("Error generating doc:", error);
 			} finally {
@@ -75,8 +77,8 @@ export default function Home() {
 
 	return (
 		<div className="flex-1 flex flex-col items-center justify-around gap-4 p-4">
-			<Card className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
-				<TitleCard companyName="GitLab" companyColors={Object.values(gitlabColors)} />
+			<Card className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl gap-0">
+				<TitleCard className="mb-10" companyName="GitLab" companyColors={Object.values(gitlabColors)} />
 				<div className="w-full flex flex-col sm:flex-row gap-2">
 					<div className="flex-[4] flex flex-col gap-2">
 						
@@ -106,13 +108,31 @@ export default function Home() {
 							<span className="text-red-500 text-sm">{errors.gitlabToken}</span>
 						)}
 
-						<Select
-							value={model}
-							onChange={(e) => setModel(e.target.value)}
-						>
-							<SelectItem value="openai">GPT-4o</SelectItem>
-							<SelectItem value="ollama">Llama 3.2 (Ollama)</SelectItem>
-						</Select>
+						<div className="flex flex-row gap-2">
+							{modelInputOpen ? (
+								<>
+									<Input
+										label="Ollama model"
+										value={modelInput}
+										className="w-full"
+										onChange={(e) => setModelInput(e.target.value)}
+										placeholder="Enter an Ollama model"
+									/>
+									<Button className="text-xs px-1 h-10" onClick={() => setModelInputOpen(!modelInputOpen)}>use default models</Button>
+								</>
+							): (
+								<>
+									<Select
+										value={model}
+										onChange={(e) => setModel(e.target.value)}
+									>
+										<SelectItem value="gpt-4o">GPT-4o</SelectItem>
+										<SelectItem value="llama3.2">Llama 3.2 (Ollama)</SelectItem>
+									</Select>
+									<Button className="text-xs px-1 h-10" onClick={() => setModelInputOpen(!modelInputOpen)}>input a model</Button>
+								</>
+							)}
+						</div>
 					</div>
 
 					<GenerateButton 
@@ -121,6 +141,9 @@ export default function Home() {
 					/>
 
 				</div>
+				{status && (
+					<p className="mt-2 text-red-500 text-xs">{status}</p>
+				)}
 			</Card>
 
 			{doc && (
