@@ -20,7 +20,8 @@ Documenter is a tool that automatically generates documentation and release note
 1. Create a .env file with your configuration:
    `OPENAI_API_KEY=your_openai_key_here`
 2. Start the service using Docker Compose:
-   `docker compose up`
+   `docker compose up -d`
+3. Go to `http://localhost:3000` to use the frontend
 
 This will start both the API service and Ollama service (for local LLM support).
 
