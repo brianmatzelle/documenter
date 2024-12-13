@@ -14,7 +14,9 @@ services:
     env_file:
       - .env
     networks:
-      - ollama-docker
+      ollama-docker:
+        aliases:
+          - api
 
   ollama:
     image: ollama/ollama:latest
@@ -30,7 +32,9 @@ services:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
     networks:
-      - ollama-docker
+      ollama-docker:
+        aliases:
+          - ollama
 
   frontend:
     image: brianmatzelle/documenter-frontend:latest
@@ -43,7 +47,12 @@ services:
       - api
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://api:8080
+    networks:
+      ollama-docker:
+        aliases:
+          - frontend
 
 networks:
   ollama-docker:
-    external: false
+    name: ollama-docker
+    driver: bridge

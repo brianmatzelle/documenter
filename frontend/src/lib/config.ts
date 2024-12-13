@@ -1,7 +1,3 @@
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
-
-if (BACKEND_URL === "http://localhost:8080") {
-	console.log("WARNING: using default backend URL, this is for development only")
-}
+const BACKEND_URL = "http://api:8080"
 
 export { BACKEND_URL }
