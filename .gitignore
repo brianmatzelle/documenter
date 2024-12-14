@@ -46,3 +46,6 @@ ollama-volume/*
 
 # debug
 debug-request.json
+
+
+.DS_Store

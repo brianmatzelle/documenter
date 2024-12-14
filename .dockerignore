@@ -11,3 +11,4 @@ scripts/*
 .gitignore
 ollama-volume/*
 demos/*
+.DS_Store
