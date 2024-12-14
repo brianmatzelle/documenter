@@ -12,3 +12,6 @@ scripts/*
 ollama-volume/*
 demos/*
 .DS_Store
+/tmp
+node_modules
+.next

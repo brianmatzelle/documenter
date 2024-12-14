@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    container_name: api-dev
+    environment:
+      - GIN_MODE=debug
+      - PORT=8080
+    env_file:
+      - .env
+    networks:
+      ollama-docker:
+        aliases:
+          - api
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    container_name: frontend-dev
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+    networks:
+      ollama-docker:
+        aliases:
+          - frontend
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - .:/code
+      - ./ollama-volume:/root/.ollama
+    container_name: ollama-dev
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      ollama-docker:
+        aliases:
+          - ollama
+
+networks:
+  ollama-docker:
+    name: ollama-docker
+    driver: bridge

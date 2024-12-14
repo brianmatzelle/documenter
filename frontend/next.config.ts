@@ -6,9 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
-        destination: process.env.NODE_ENV === "production" 
-          ? "http://api:8080/:path*"  // Docker internal network
-          : "http://localhost:8080/:path*",  // Local development
+        destination: "http://api:8080/:path*",
       },
     ];
   },
