@@ -63,3 +63,28 @@ func GenerateDocController(c *gin.Context) {
 		c.Writer.Flush()
 	}
 }
+
+func GenFromAuthorController(c *gin.Context) {
+	author := c.Query("author")
+	gitlabToken := c.Query("gitlabToken")
+	model := c.Query("model")
+
+	statusChan := make(chan string)
+	// Call service asynchronously
+	go func() {
+		response, err := services.GenDocFromAuthor(author, gitlabToken, model, statusChan)
+		if err != nil {
+			c.SSEvent("error", gin.H{"error": err.Error()})
+			close(statusChan)
+			return
+		}
+		c.SSEvent("complete", gin.H{"doc": response})
+		close(statusChan)
+	}()
+
+	// Send status updates to client
+	for status := range statusChan {
+		c.SSEvent("status", gin.H{"message": status})
+		c.Writer.Flush()
+	}
+}

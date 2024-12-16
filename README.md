@@ -23,6 +23,12 @@ Documenter is a tool that automatically generates documentation and release note
    `docker compose up -d`
 3. Go to `http://localhost:3000` to use the frontend
 
+### For local development
+
+1. To start all development services, in the root directory run:
+   `./dev.sh`
+2. Go to `http://localhost:3000` to use the frontend, or `http://localhost:8080` to use the API.
+
 This will start both the API service and Ollama service (for local LLM support).
 
 ## API Documentation

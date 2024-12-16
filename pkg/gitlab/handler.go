@@ -10,6 +10,42 @@ import (
 	"documenter/pkg/gitlab/lib"
 )
 
+func GetMrLinksFromAuthor(author string, gitlabToken string) ([]string, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, "https://gitlab.icg360.net/api/v4/merge_requests?author_username="+author, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating request: %w", err)
+	}
+	req.Header.Set("PRIVATE-TOKEN", gitlabToken)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("executing request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading response: %w", err)
+	}
+
+	// Parse the JSON array
+	var mergeRequests []map[string]interface{}
+	if err := json.Unmarshal(body, &mergeRequests); err != nil {
+		return nil, fmt.Errorf("parsing JSON response: %w", err)
+	}
+
+	// Extract web_urls
+	webUrls := make([]string, 0, len(mergeRequests))
+	for _, mr := range mergeRequests {
+		if webUrl, ok := mr["web_url"].(string); ok {
+			webUrls = append(webUrls, webUrl)
+		}
+	}
+
+	return webUrls, nil
+}
+
 func GetMrInfo(mrLink string, gitlabToken string, model string) (json.RawMessage, error) {
 	apiLink, err := lib.TranslateMrLinkToApiLink(mrLink, gitlabToken)
 	if err != nil {

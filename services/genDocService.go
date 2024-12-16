@@ -26,26 +26,6 @@ func GenerateDocService(request requests.GenDocRequest, statusChan chan string) 
 		log.Println("Appended MR info to list")
 	}
 
-	// if slices.Contains(SUPPORTED_OPENAI_MODELS, request.Model) {
-	// 	statusChan <- fmt.Sprintf("[OpenAI]: %s selected...", request.Model)
-	// 	docStr, err := generate.GenerateDocOpenAI(mrInfos)
-	// 	if err != nil {
-	// 		log.Printf("Failed to generate document: %v", err)
-	// 		return "", fmt.Errorf("failed to generate document: %w", err)
-	// 	}
-	// 	log.Printf("Successfully generated document with %s: %s", request.Model, docStr)
-	// 	return docStr, nil
-	// } else {
-	// 	statusChan <- fmt.Sprintf("[Ollama]: %s selected...", request.Model)
-	// 	docStr, err := generate.GenerateDocOllama(mrInfos, request.Model, statusChan)
-	// 	if err != nil {
-	// 		log.Printf("Failed to generate document: %v", err)
-	// 		return "", fmt.Errorf("failed to generate document: %w", err)
-	// 	}
-	// 	log.Println("Successfully generated document: ", docStr)
-	// 	close(statusChan)
-	// 	return docStr, nil
-	// }
 	if lib.IsOpenAIModel(request.Model) {
 		statusChan <- fmt.Sprintf("[OpenAI]: %s selected...", request.Model)
 		docStr, err := generate.GenerateDocOpenAI(mrInfos)

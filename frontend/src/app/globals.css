@@ -19,3 +19,11 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.bg-cinnabar {
+  background-color: #e64a19;
+}
+
+.bg-orange {
+  background-color: #ff9800;
+}
