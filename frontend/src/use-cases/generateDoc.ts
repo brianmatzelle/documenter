@@ -1,8 +1,7 @@
-export async function generateDoc(mrLinks: string[], gitlabToken: string, model: string, setStatus: (status: string) => void): Promise<string> {
+export async function generateDoc(mrLinks: string[], model: string, setStatus: (status: string) => void): Promise<string> {
   // Return an EventSource that the caller can use to listen for events
   const eventSource = new EventSource(`/generate-doc?${new URLSearchParams({
     mrLinks: JSON.stringify(mrLinks),
-    gitlabToken,
     model: model.toLowerCase(),
   })}`);
 
@@ -34,10 +33,9 @@ export async function generateDoc(mrLinks: string[], gitlabToken: string, model:
   });
 }
 
-export async function generateDocFromAuthor(gitlabUsername: string, gitlabToken: string, model: string, setStatus: (status: string) => void): Promise<string> {
+export async function generateDocFromAuthor(gitlabUsername: string, model: string, setStatus: (status: string) => void): Promise<string> {
   const eventSource = new EventSource(`/gen-from-author?${new URLSearchParams({
     author: gitlabUsername,
-    gitlabToken,
     model: model.toLowerCase(),
   })}`);
 

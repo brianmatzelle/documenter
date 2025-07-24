@@ -18,7 +18,10 @@ Documenter is a tool that automatically generates documentation and release note
 ## Quick Start
 
 1. Create a .env file with your configuration:
-   `OPENAI_API_KEY=your_openai_key_here`
+   ```
+   OPENAI_API_KEY=your_openai_key_here
+   GITLAB_TOKEN=your_gitlab_token_here
+   ```
 2. Start the service using Docker Compose:
    `docker compose up -d`
 3. Go to `http://localhost:3000` to use the frontend
@@ -45,25 +48,36 @@ http://localhost:8080
 
 #### Generate Documentation
 
-`POST /generate-doc`
+`GET /generate-doc` (Server-Sent Events)
 
-Request Body:
+Query Parameters:
+- `mrLinks`: JSON array of merge request URLs (required)
+- `model`: AI model to use - "gpt-4o" or "llama3.2" (required)
 
-```json
-{
-    "mrLinks": ["https://gitlab.com/your-project/merge_requests/1", "https://gitlab.com/your-project/merge_requests/2"],
-    "gitlabToken": "your-gitlab-token",
-    "model": "ollama" OR "openai"
-}
+Example:
+```
+GET /generate-doc?mrLinks=["https://gitlab.com/your-project/merge_requests/1"]&model=gpt-4o
 ```
 
-Response:
+#### Generate Documentation from Author
 
-```json
-{
-    "doc": "Generated markdown documentation"
-}
+`GET /gen-from-author` (Server-Sent Events)
+
+Query Parameters:
+- `author`: GitLab username (required)
+- `model`: AI model to use - "gpt-4o" or "llama3.2" (required)
+
+Example:
 ```
+GET /gen-from-author?author=username&model=gpt-4o
+```
+
+**Note**: Both endpoints use Server-Sent Events (SSE) to stream status updates and return the final documentation. The GitLab token is configured as an environment variable on the server side for security.
+
+Response Events:
+- `status`: Progress updates during generation
+- `complete`: Final generated documentation
+- `error`: Error messages if generation fails
 
 Status Codes:
 
@@ -83,7 +97,8 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/ping", Ping)
-	router.POST("/generate-doc", GenerateDocController)
+	router.GET("/generate-doc", GenerateDocController)
+	router.GET("/gen-from-author", GenFromAuthorController)
 
 	return router
 }
@@ -93,37 +108,44 @@ func SetupRouter() *gin.Engine {
    - Reference:
 
 ```go
-func GenerateDocService(request requests.GenDocRequest) (string, error) {
+func GenerateDocService(request requests.GenDocRequest, statusChan chan string) (string, error) {
 	log.Println("Starting document generation process...")
 
-	mrInfo, err := gitlab.GetMrInfo(request.MrLink, request.GitlabToken)
-	if err != nil {
-		log.Printf("Failed to fetch MR info: %v", err)
-		return "", fmt.Errorf("failed to fetch merge request info: %w", err)
+	// Get GitLab token from environment
+	gitlabToken := config.GetEnv("GITLAB_TOKEN")
+	if gitlabToken == "" {
+		return "", fmt.Errorf("GITLAB_TOKEN environment variable is not set")
 	}
-	log.Println("Successfully fetched MR info")
 
-	switch request.Model {
-	case "ollama":
-		log.Println("Starting document generation with Ollama...")
-		docStr, err := generate.GenerateDocOllama(mrInfo)
+	var mrInfos []json.RawMessage
+	for _, mrLink := range request.MrLinks {
+		mrInfo, err := gitlab.GetMrInfo(mrLink, gitlabToken, request.Model)
+		if err != nil {
+			log.Printf("Failed to fetch MR info: %v", err)
+			return "", fmt.Errorf("failed to fetch merge request info: %w", err)
+		}
+		log.Println("Successfully fetched MR info for ", mrLink)
+		mrInfos = append(mrInfos, mrInfo)
+	}
+
+	if lib.IsOpenAIModel(request.Model) {
+		statusChan <- fmt.Sprintf("[OpenAI]: %s selected...", request.Model)
+		docStr, err := generate.GenerateDocOpenAI(mrInfos)
 		if err != nil {
 			log.Printf("Failed to generate document: %v", err)
 			return "", fmt.Errorf("failed to generate document: %w", err)
 		}
 		log.Println("Successfully generated document")
 		return docStr, nil
-	case "openai":
-		log.Println("Starting document generation with OpenAI...")
-		docStr, err := generate.GenerateDocOpenAI(mrInfo)
+	} else {
+		statusChan <- fmt.Sprintf("[Ollama]: %s selected...", request.Model)
+		docStr, err := generate.GenerateDocOllama(mrInfos, request.Model, statusChan)
 		if err != nil {
 			log.Printf("Failed to generate document: %v", err)
 			return "", fmt.Errorf("failed to generate document: %w", err)
 		}
 		log.Println("Successfully generated document")
 		return docStr, nil
-	default:
-		return "", fmt.Errorf("invalid model: %s", request.Model)
 	}
 }
 ```
@@ -259,6 +281,16 @@ networks:
 
 Adjust these configs to change models, add new ones, etc.
 
+### Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```
+OPENAI_API_KEY=your_openai_api_key_here
+GITLAB_TOKEN=your_gitlab_token_here
+PORT=8080  # Optional, defaults to 8080
+```
+
 ### OpenAI Settings
 
 in `pkg/generate/openai/config/config.go`
@@ -285,24 +317,50 @@ const OLLAMA_PRE_PROMPT = "Generate markdown documentation for this merge reques
 
 ## Example Usage
 
-Using curl:
+Using curl with Server-Sent Events:
 
 ```bash
-curl -X POST http://localhost:8080/generate-doc \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mrLink": "https://gitlab.com/your-project/merge_requests/1",
-    "gitlabToken": "your-gitlab-token",
-    "model": "ollama"
-  }'
+# Generate documentation from merge request links
+curl -N "http://localhost:8080/generate-doc?mrLinks=[\"https://gitlab.com/your-project/merge_requests/1\"]&model=gpt-4o"
+
+# Generate documentation from author's recent merge requests
+curl -N "http://localhost:8080/gen-from-author?author=your-username&model=llama3.2"
+```
+
+Using JavaScript (EventSource):
+
+```javascript
+const eventSource = new EventSource('/generate-doc?' + new URLSearchParams({
+  mrLinks: JSON.stringify(['https://gitlab.com/your-project/merge_requests/1']),
+  model: 'gpt-4o'
+}));
+
+eventSource.addEventListener('status', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Status:', data.message);
+});
+
+eventSource.addEventListener('complete', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Generated documentation:', data.doc);
+  eventSource.close();
+});
+
+eventSource.addEventListener('error', (event) => {
+  const data = JSON.parse(event.data);
+  console.error('Error:', data.error);
+  eventSource.close();
+});
 ```
 
 ## Notes
 
 - Ensure you have Docker and Docker Compose installed
 - The Ollama service may take some time to initially download and load the LLM model
+- GitLab token is configured as an environment variable on the server side for security
 - GitLab token requires appropriate permissions to access merge request information
-- Choose between "GPT-4o" or "Llama3.2" as the model parameter based on your needs
+- Choose between "gpt-4o" or "llama3.2" as the model parameter based on your needs
+- The API uses Server-Sent Events (SSE) for real-time status updates during document generation
 
 ## Todo
 
@@ -311,6 +369,7 @@ curl -X POST http://localhost:8080/generate-doc \
   - [X] Ollama (local)
   - [ ] Anthropic
 - [X] Parse and clean the merge request data to improve prompt quality
+- [X] Move GitLab token to server-side environment variables for security
 - [ ] Refine the pre-prompt to produce more desirable documentation results
 - [ ] Implement chat functionality so the user can talk with the merge request.
   - [ ] "Adjust X and include Y..."

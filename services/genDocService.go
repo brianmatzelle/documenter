@@ -1,6 +1,7 @@
 package services
 
 import (
+	"documenter/config"
 	"documenter/models/requests"
 	"encoding/json"
 	"fmt"
@@ -14,9 +15,15 @@ import (
 func GenerateDocService(request requests.GenDocRequest, statusChan chan string) (string, error) {
 	log.Println("Starting document generation process...")
 
+	// Get GitLab token from environment
+	gitlabToken := config.GetEnv("GITLAB_TOKEN")
+	if gitlabToken == "" {
+		return "", fmt.Errorf("GITLAB_TOKEN environment variable is not set")
+	}
+
 	var mrInfos []json.RawMessage
 	for _, mrLink := range request.MrLinks {
-		mrInfo, err := gitlab.GetMrInfo(mrLink, request.GitlabToken, request.Model)
+		mrInfo, err := gitlab.GetMrInfo(mrLink, gitlabToken, request.Model)
 		if err != nil {
 			log.Printf("Failed to fetch MR info: %v", err)
 			return "", fmt.Errorf("failed to fetch merge request info: %w", err)

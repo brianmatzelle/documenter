@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import TitleCard from "@/components/titleCard";
 import Input from "@/components/ui/input";
 import Card from "@/components/ui/card";
@@ -21,7 +22,6 @@ enum RequestType {
 
 export default function Home() {
 	const [mrLinks, setMrLinks] = useState([""]);
-	const [gitlabToken, setGitlabToken] = useState("");
 	const [model, setModel] = useState("gpt-4o");
 	const [modelInput, setModelInput] = useState("");
 	const [modelInputOpen, setModelInputOpen] = useState(false);
@@ -30,7 +30,6 @@ export default function Home() {
 	const [status, setStatus] = useState("");
 	const [errors, setErrors] = useState({
 		mrLink: "",
-		gitlabToken: "",
 		gitlabUsername: "",
 	});
 	const [loading, setLoading] = useState(false);
@@ -39,13 +38,13 @@ export default function Home() {
 
 	const validateForm = () => {
 		let isValid = true;
-		const newErrors = { mrLink: "", gitlabToken: "", gitlabUsername: "" };
+		const newErrors = { mrLink: "", gitlabUsername: "" };
 
 		if (requestType === RequestType.MANUAL) {
 			if (mrLinks.length === 0) {
 				setStatus("MR link is required");
 				isValid = false;
-			} else if (!mrLinks.every(link => link.includes("gitlab"))) {
+			} else if (!mrLinks.every((link: string) => link.includes("gitlab"))) {
 				setStatus("At least one MR link is invalid, only GitLab MR links are supported as of now.");
 				isValid = false;
 			}
@@ -54,11 +53,6 @@ export default function Home() {
 				setStatus("GitLab username is required");
 				isValid = false;
 			}
-		}
-
-		if (!gitlabToken.trim()) {
-			setStatus("GitLab token is required");
-			isValid = false;
 		}
 
 		setErrors(newErrors);
@@ -70,11 +64,11 @@ export default function Home() {
 			try {
 				setLoading(true);
 				if (requestType === RequestType.MANUAL) {
-					const response: string = await generateDoc(mrLinks, gitlabToken, model, setStatus);
+					const response: string = await generateDoc(mrLinks, model, setStatus);
 					console.log(response);
 					setDoc(response);
 				} else {
-					const response: string = await generateDocFromAuthor(gitlabUsername, gitlabToken, model, setStatus);
+					const response: string = await generateDocFromAuthor(gitlabUsername, model, setStatus);
 					console.log(response);
 					setDoc(response);
 				}
@@ -134,21 +128,6 @@ export default function Home() {
 									<span className="text-red-500 text-sm">{errors.gitlabUsername}</span>
 								)}
 							</>
-						)}
-
-						<Input 
-							label="GitLab Token"
-							value={gitlabToken}
-							onChange={(e) => {
-								setGitlabToken(e.target.value);
-								if (errors.gitlabToken) setErrors(prev => ({ ...prev, gitlabToken: "" }));
-							}}
-							placeholder="Enter your GitLab token here"
-							className={errors.gitlabToken ? "border-red-500" : ""} 
-							type="password"
-						/>
-						{errors.gitlabToken && (
-							<span className="text-red-500 text-sm">{errors.gitlabToken}</span>
 						)}
 
 						<div className="flex flex-row gap-2">

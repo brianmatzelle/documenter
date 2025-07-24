@@ -51,3 +51,5 @@ debug-request.json
 
 # Development
 tmp/
+
+documenter
