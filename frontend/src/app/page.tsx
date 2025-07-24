@@ -104,7 +104,7 @@ export default function Home() {
 					<div className="flex-[4] flex flex-col gap-2">
 
 						<div className="flex flex-row">
-							<Button className={`w-full py-1 ${requestType === RequestType.MANUAL ? "bg-[#e64a19]/80" : "bg-transparent"}`} onClick={() => setRequestType(RequestType.MANUAL)}>Manual</Button>
+							<Button className={`w-full py-1 ${requestType === RequestType.MANUAL ? "bg-[#e64a19]/80" : "bg-transparent"}`} onClick={() => setRequestType(RequestType.MANUAL)}>MR Link(s)</Button>
 							<Button className={`w-full py-1 ${requestType === RequestType.AUTHOR ? "bg-[#e64a19]/80" : "bg-transparent"}`} onClick={() => setRequestType(RequestType.AUTHOR)}>Author</Button>
 						</div>
 						
